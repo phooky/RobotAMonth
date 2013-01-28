@@ -30,10 +30,17 @@ PWMServo craneServo;
 
 void initCrane() {
   craneServo.attach(crane_servo_pin);
-  craneServo.write(90);
+  setCrane(40);
 }
 
+const int CRANE_MIN = 25;
+const int CRANE_MAX = 80;
+int cranePos = CRANE_MIN;
+
 void setCrane(int angle) {
+  if (angle < CRANE_MIN) { angle = CRANE_MIN; }
+  if (angle > CRANE_MAX) { angle = CRANE_MAX; }
+  cranePos = angle;
   craneServo.write(angle);
 }
 
@@ -129,6 +136,15 @@ void loop() {
       case '8': setCrane(110); break;
       case '9': setCrane(120); break;
       case '0': setCrane(130); break;
+      case '+':
+      case '=':
+        setCrane(cranePos + 1);
+        Serial.println(cranePos);
+        break;
+      case '-':
+        setCrane(cranePos - 1);
+        Serial.println(cranePos);
+        break;
     }
   }
   //digitalWrite(11,digitalRead(gantry_limit_switch));
