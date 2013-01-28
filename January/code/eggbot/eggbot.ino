@@ -1,4 +1,4 @@
-
+#include <PWMServo.h>
 
 const int gantry_enable_pin = 21;
 const int gantry_in3_pin = 20;
@@ -6,6 +6,9 @@ const int gantry_in4_pin = 19;
 const int gantry_limit_switch = 18;
 const int gantry_station_switch = 17;
 const int gantry_brake_pin = 16;
+
+const int crane_servo_pin = 15;
+const int claw_servo_pin = 14;
 
 const int MOTOR_OFF = 0;
 const int MOTOR_FORWARD = 1;
@@ -21,6 +24,28 @@ void initGantry() {
   gantryMotor(MOTOR_OFF);
   pinMode(gantry_limit_switch, INPUT_PULLUP);
   pinMode(gantry_station_switch, INPUT_PULLUP);
+}
+
+PWMServo craneServo;
+
+void initCrane() {
+  craneServo.attach(crane_servo_pin);
+  craneServo.write(90);
+}
+
+void setCrane(int angle) {
+  craneServo.write(angle);
+}
+
+PWMServo clawServo;
+
+void initClaw() {
+  clawServo.attach(claw_servo_pin);
+  clawServo.write(90);
+}
+
+void setClaw(int angle) {
+  clawServo.write(angle);
 }
 
 void gantryMotor(int direction) {
@@ -85,18 +110,36 @@ void gantryNextStation() {
 
 void setup() {
  initGantry();
+ initCrane();
+ initClaw();
+ Serial.begin(19200);
 }
 
 void loop() {
+  if (Serial.available()) {
+    int c = Serial.read();
+    switch (c) {
+      case '1': setCrane(40); break;
+      case '2': setCrane(50); break;
+      case '3': setCrane(60); break;
+      case '4': setCrane(70); break;
+      case '5': setCrane(80); break;
+      case '6': setCrane(90); break;
+      case '7': setCrane(100); break;
+      case '8': setCrane(110); break;
+      case '9': setCrane(120); break;
+      case '0': setCrane(130); break;
+    }
+  }
   //digitalWrite(11,digitalRead(gantry_limit_switch));
-  digitalWrite(11,LOW);
-  gantryHome();
-  delay(1000);
-  digitalWrite(11,HIGH);
-  gantryNextStation();
-  delay(1000);
-  gantryNextStation();
-  delay(1000);
+//  digitalWrite(11,LOW);
+//  gantryHome();
+//  delay(1000);
+//  digitalWrite(11,HIGH);
+//  gantryNextStation();
+//  delay(1000);
+//  gantryNextStation();
+//  delay(1000);
   //gantryNextStation();
   //delay(1000);
 }
