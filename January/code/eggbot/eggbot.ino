@@ -44,8 +44,10 @@ void setCrane(int angle) {
   craneServo.write(angle);
 }
 
-PWMServo clawServo;
+const int CLAW_MIN = 8;
+const int CLAW_MAX = 94;
 
+PWMServo clawServo;
 void initClaw() {
   clawServo.attach(claw_servo_pin);
   clawServo.write(90);
