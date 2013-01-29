@@ -485,19 +485,19 @@ $SKPOLY
   9
 $TDCREATE
  40
-2456321.588344896
+2456322.545972211
   9
 $TDUCREATE
  40
-2456321.796678241
+2456322.754305555
   9
 $TDUPDATE
  40
-2456321.588344896
+2456322.545972211
   9
 $TDUUPDATE
  40
-2456321.796678241
+2456322.754305555
   9
 $TDINDWG
  40
@@ -925,7 +925,7 @@ $PSTYLEMODE
   9
 $FINGERPRINTGUID
   2
-{F3361B3B-4DA7-4B5A-2769-1369898F7A9A}
+{E34A56F5-F53D-2512-40DB-12E1AD501092}
   9
 $VERSIONGUID
   2
@@ -2081,7 +2081,7 @@ AcDbLayerTableRecord
   2
 0
  70
-     1
+     0
  62
      7
 420
@@ -2107,7 +2107,7 @@ AcDbLayerTableRecord
   2
 guides
  70
-     1
+     0
  62
    178
 420
@@ -2159,7 +2159,7 @@ AcDbLayerTableRecord
   2
 Defpoints
  70
-     1
+     0
  62
      7
 420
@@ -2187,7 +2187,7 @@ AcDbLayerTableRecord
   2
 dipper
  70
-     1
+     0
  62
    178
 420
@@ -2213,7 +2213,7 @@ AcDbLayerTableRecord
   2
 mount
  70
-     1
+     0
  62
      1
 420
@@ -2239,7 +2239,7 @@ AcDbLayerTableRecord
   2
 cross
  70
-     1
+     0
  62
    253
 420
@@ -2265,7 +2265,7 @@ AcDbLayerTableRecord
   2
 testplate
  70
-     1
+     0
  62
    178
 420
@@ -2291,7 +2291,7 @@ AcDbLayerTableRecord
   2
 lever2
  70
-     1
+     0
  62
    178
 420
@@ -2317,7 +2317,7 @@ AcDbLayerTableRecord
   2
 bskel
  70
-     1
+     0
  62
      5
 420
@@ -2343,7 +2343,7 @@ AcDbLayerTableRecord
   2
 crossplate
  70
-     1
+     0
  62
    178
 420
@@ -2369,7 +2369,7 @@ AcDbLayerTableRecord
   2
 switchstop
  70
-     1
+     0
  62
      2
 420
@@ -2395,7 +2395,7 @@ AcDbLayerTableRecord
   2
 lever
  70
-     1
+     0
  62
    178
 420
@@ -2421,7 +2421,7 @@ AcDbLayerTableRecord
   2
 spacer
  70
-     1
+     0
  62
    178
 420
