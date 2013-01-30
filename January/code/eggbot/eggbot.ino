@@ -143,6 +143,16 @@ void loop() {
         setCrane(cranePos + 1);
         Serial.println(cranePos);
         break;
+      case 'h':
+      case 'H':
+        Serial.println("Homing.");
+        gantryHome();
+        break;
+      case 's':
+      case 'S':
+        Serial.println("Next station.");
+        gantryNextStation();
+        break;
       case '-':
         setCrane(cranePos - 1);
         Serial.println(cranePos);
