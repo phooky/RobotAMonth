@@ -28,33 +28,77 @@ void initGantry() {
 
 PWMServo craneServo;
 
+
+const int CRANE_MIN = 20;
+const int CRANE_MAX = 105;
+int cranePos;
+
+const int CRANE_UP = CRANE_MAX;
+const int CRANE_LOAD = 75;
+const int CRANE_DOWN = CRANE_MIN;
+
 void initCrane() {
   craneServo.attach(crane_servo_pin);
-  setCrane(40);
+  cranePos = CRANE_UP;
+  craneServo.write(CRANE_UP);
 }
-
-const int CRANE_MIN = 25;
-const int CRANE_MAX = 80;
-int cranePos = CRANE_MIN;
 
 void setCrane(int angle) {
   if (angle < CRANE_MIN) { angle = CRANE_MIN; }
   if (angle > CRANE_MAX) { angle = CRANE_MAX; }
+  int dir = (angle>cranePos)?1:-1;
+  while (cranePos != angle) {
+    cranePos += dir;
+    craneServo.write(cranePos);
+    delay(30);
+  }
   cranePos = angle;
   craneServo.write(angle);
 }
 
-const int CLAW_MIN = 8;
-const int CLAW_MAX = 94;
+void craneUp() {
+  setCrane(CRANE_UP);
+}
+
+void craneLoad() {
+  setCrane(CRANE_LOAD);
+}
+
+void craneDown() {
+  setCrane(CRANE_DOWN);
+}
+
+const int CLAW_MIN = 25;
+const int CLAW_MAX = 85;
+const int CLAW_OPEN = 43;
+const int CLAW_CLOSED = 27;
+
+int clawPos;
 
 PWMServo clawServo;
 void initClaw() {
   clawServo.attach(claw_servo_pin);
-  clawServo.write(90);
+  clawPos = CLAW_OPEN;
+  clawServo.write(clawPos);
 }
 
 void setClaw(int angle) {
-  clawServo.write(angle);
+  if (angle < CLAW_MIN) { angle = CLAW_MIN; }
+  if (angle > CLAW_MAX) { angle = CLAW_MAX; }
+  int dir = (angle>clawPos)?1:-1;
+  while (clawPos != angle) {
+    clawPos += dir;
+    clawServo.write(clawPos);
+    delay(20);
+  }
+}
+
+void closeClaw() {
+  setClaw(CLAW_CLOSED);
+}
+
+void openClaw() {
+  setClaw(CLAW_OPEN);
 }
 
 void gantryMotor(int direction) {
@@ -95,6 +139,7 @@ void gantryHome() {
   gantryMotor(MOTOR_BRAKE);
   delay(500);
   gantryMotor(MOTOR_OFF);
+  delay(500); // settle oscillations
 }
 
 void debounceWaitFor(int pin, int value) {
@@ -115,6 +160,7 @@ void gantryNextStation() {
   gantryMotor(MOTOR_BRAKE);
   delay(500);
   gantryMotor(MOTOR_OFF);
+  delay(500); // settle oscillations
 }
 
 void setup() {
@@ -124,25 +170,63 @@ void setup() {
  Serial.begin(19200);
 }
 
+void run() {
+  Serial.println("Running program.");
+  openClaw();
+  craneUp();
+  Serial.println("1. Home");
+  gantryHome();
+  Serial.println("2. To loading station");
+  gantryNextStation();
+  Serial.println("3. Acquire egg");
+  openClaw();
+  craneLoad();
+  closeClaw();
+  craneUp();
+  Serial.println("4. To cooking station");
+  gantryNextStation();
+  gantryNextStation();
+  delay(500);
+  Serial.println("5. Cook egg");
+  craneDown();
+  delay(2000);
+  craneUp();
+  Serial.println("6. To unloading station");
+  gantryHome();
+  gantryNextStation();
+  Serial.println("7. Deposit egg");
+  craneLoad();
+  openClaw();
+  craneUp();
+  gantryHome();
+  Serial.println("Egg cooking procedure complete.");
+}
+
 void loop() {
   if (Serial.available()) {
     int c = Serial.read();
     switch (c) {
-      case '1': setCrane(40); break;
-      case '2': setCrane(50); break;
-      case '3': setCrane(60); break;
-      case '4': setCrane(70); break;
-      case '5': setCrane(80); break;
-      case '6': setCrane(90); break;
-      case '7': setCrane(100); break;
-      case '8': setCrane(110); break;
-      case '9': setCrane(120); break;
-      case '0': setCrane(130); break;
       case '+':
       case '=':
         setCrane(cranePos + 1);
+        Serial.print("CRANE: ");
         Serial.println(cranePos);
         break;
+      case '-':
+        setCrane(cranePos - 1);
+        Serial.print("CRANE: ");
+        Serial.println(cranePos);
+        break;
+      case '[':
+        setClaw(clawPos - 1);
+        Serial.print("CLAW: ");
+        Serial.println(clawPos);
+        break;
+      case ']':
+        setClaw(clawPos + 1);
+        Serial.print("CLAW: ");
+        Serial.println(clawPos);
+        break;       
       case 'h':
       case 'H':
         Serial.println("Homing.");
@@ -153,10 +237,36 @@ void loop() {
         Serial.println("Next station.");
         gantryNextStation();
         break;
-      case '-':
-        setCrane(cranePos - 1);
-        Serial.println(cranePos);
+      case 'c':
+      case 'C':
+        Serial.println("*Claw close.");
+        closeClaw();
         break;
+      case 'o':
+      case 'O':
+        Serial.println("*Claw open.");
+        openClaw();
+        break;
+      case 'u':
+      case 'U':
+        Serial.println("+Crane up.");
+        craneUp();
+        break;
+      case 'd':
+      case 'D':
+        Serial.println("+Crane down.");
+        craneDown();
+        break;
+      case 'l':
+      case 'L':
+        Serial.println("+Crane load.");
+        craneLoad();
+        break;
+      case 'r':
+      case 'R':
+        run();
+        break;
+        
     }
   }
   //digitalWrite(11,digitalRead(gantry_limit_switch));
