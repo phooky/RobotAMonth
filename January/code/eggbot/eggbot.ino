@@ -10,6 +10,8 @@ const int gantry_brake_pin = 16;
 const int crane_servo_pin = 15;
 const int claw_servo_pin = 14;
 
+const int start_button_pin = 0;
+
 const int MOTOR_OFF = 0;
 const int MOTOR_FORWARD = 1;
 const int MOTOR_BACKWARD = 2;
@@ -153,8 +155,8 @@ void debounceWaitFor(int pin, int value) {
   }
 }
 
-void gantryNextStation() {
-  gantryMotor(MOTOR_FORWARD);
+void gantryNextStation(boolean forward = true) {
+  gantryMotor(forward?MOTOR_FORWARD:MOTOR_BACKWARD);
   debounceWaitFor(gantry_station_switch,HIGH);
   debounceWaitFor(gantry_station_switch,LOW);
   gantryMotor(MOTOR_BRAKE);
@@ -163,11 +165,13 @@ void gantryNextStation() {
   delay(500); // settle oscillations
 }
 
+
 void setup() {
- initGantry();
- initCrane();
- initClaw();
- Serial.begin(19200);
+  initGantry();
+  initCrane();
+  initClaw();
+  pinMode(start_button_pin, INPUT_PULLUP);
+  Serial.begin(19200);
 }
 
 void run() {
@@ -267,6 +271,9 @@ void loop() {
         run();
         break;
         
+    }
+    if (digitalRead(start_button_pin) == LOW) {
+      run();
     }
   }
   //digitalWrite(11,digitalRead(gantry_limit_switch));
