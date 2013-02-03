@@ -310,12 +310,12 @@ void run() {
   gantryNextStation(2);
   smartDelay(500);
   Serial.println("5. Cook egg");
-  if (!waitForTemp(75,100)) {
+  if (!waitForTemp(90,100)) {
     Serial.println("*** EGGBORT EGGBOT EGGBORT ***");
     return;
   }
   craneDown();
-  for (int i = 60*3; i > 0; i--) {
+  for (int i = 190; i > 0; i--) {
     Serial.print("Cooking at ");
     Serial.print(getTemperature());
     Serial.print(", ");
@@ -328,9 +328,10 @@ void run() {
   craneUp();
   Serial.println("6. To cooling station");
   gantryNextStation(1,false);
-  Serial.println("7. Cool egg");
+  Serial.println("7. Cool egg for 15 seconds");
   craneDown();
   smartDelay(8000);
+  smartDelay(7000);
   craneUp();
   Serial.println("8. To unloading station");
   gantryHome();
