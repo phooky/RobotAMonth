@@ -1,3 +1,5 @@
+// This code is targeted for a Teensy 2.0.
+
 #include <PWMServo.h>
 // PID library from http://playground.arduino.cc/Code/PIDLibrary
 #include <PID_v1.h>
@@ -327,7 +329,7 @@ void run() {
     return;
   }
   craneDown();
-  for (int i = 380; i > 0; i--) {
+  for (int i = 365; i > 0; i--) {
     Serial.print("Cooking at ");
     Serial.print(getTemperature());
     Serial.print(", ");
