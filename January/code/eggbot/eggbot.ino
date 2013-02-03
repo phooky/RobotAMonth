@@ -78,7 +78,7 @@ void initGantry() {
 PWMServo craneServo;
 
 
-const int CRANE_MIN = 20;
+const int CRANE_MIN = 17;
 const int CRANE_MAX = 105;
 int cranePos;
 
@@ -216,14 +216,19 @@ void gantryNextStation(int stations = 1,boolean forward = true) {
   smartDelay(500); // settle oscillations
 }
 
+boolean lastState = false;
 void switchHeater(boolean on = false) {
+  if (on != lastState) {
+    Serial.println(on?"-- ON":"-- OFF");
+    lastState = on;
+  }
   digitalWrite(heating_coil_pin, on?HIGH:LOW);
 }
 
 
 // from PID relay example
 double hSP, hIn, hOut;
-PID hPID(&hIn, &hOut, &hSP,5,1,2, DIRECT);
+PID hPID(&hIn, &hOut, &hSP,12,0.1,2, DIRECT);
 unsigned long windowStartTime;
 
 void initHeater() {
@@ -231,8 +236,9 @@ void initHeater() {
   pinMode(heating_coil_pin, OUTPUT);
   switchHeater(false);
   hSP = 0;
-  hPID.SetOutputLimits(0, 5000);
+  hPID.SetOutputLimits(0, 255);
   hPID.SetMode(AUTOMATIC);
+  hPID.SetSampleTime(600);
   windowStartTime = millis();
 }
 
@@ -240,31 +246,37 @@ void setHeat(int value = 0) {
   if (value == 0) {
     switchHeater(false);
   }
-  if (value > 90) value = 90; // clamp at safe value
+  if (value > 95) value = 95; // clamp at safe value
   hSP = value;
 }
 
 unsigned long shutdownWhen = 0;
+const unsigned int windowLen = 4096;
+
+unsigned long lastOne = 0;
 void updateTemp() {
   int cur = getTemperature();
   hIn = cur;
   hPID.Compute();
   unsigned long now = millis();
-  if((now - windowStartTime) > 5000)
+  if((now - windowStartTime) > windowLen)
   { //time to shift the Relay Window
-    windowStartTime += 5000;
+    windowStartTime += windowLen;
   }
   if (hSP <= 0) { switchHeater(false); return; }
-  if (cur > 95) {
+  if (cur > 98) {
+    Serial.println("SHUTDOWN!");
     shutdownWhen = now;
     switchHeater(false);
     return;
   }
-  if ((now - shutdownWhen) < 2000) {
+  if ((now - shutdownWhen) < 500) {
+    Serial.println("-DELAY");
     switchHeater(false);
     return;
-  }  
-  switchHeater(hOut > (now - windowStartTime));
+  }
+  unsigned int out = hOut * 16;
+  switchHeater(out > (now - windowStartTime));
 }
 
 void setup() {
@@ -310,12 +322,12 @@ void run() {
   gantryNextStation(2);
   smartDelay(500);
   Serial.println("5. Cook egg");
-  if (!waitForTemp(90,100)) {
+  if (!waitForTemp(91,100)) {
     Serial.println("*** EGGBORT EGGBOT EGGBORT ***");
     return;
   }
   craneDown();
-  for (int i = 190; i > 0; i--) {
+  for (int i = 380; i > 0; i--) {
     Serial.print("Cooking at ");
     Serial.print(getTemperature());
     Serial.print(", ");
